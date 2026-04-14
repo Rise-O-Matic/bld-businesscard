@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=News+Cycle:wght@400;700&family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -97,23 +99,23 @@
       border-radius: 2px;
     }
 
-    /* Gradient accent strip at top */
+    /* Gradient accent strip at top — extends into bleed, clipped by overflow:hidden */
     .accent-strip {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 6px;
+      top: -25px;
+      left: -25px;
+      right: -25px;
+      height: 31px;
       z-index: 2;
     }
 
-    /* Subtle wave at bottom */
+    /* Subtle wave at bottom — extends into bleed on all sides, clipped by overflow:hidden */
     .wave-bottom {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 105px;
+      bottom: -25px;
+      left: -25px;
+      right: -25px;
+      height: 130px;
       pointer-events: none;
       z-index: 0;
     }
@@ -128,6 +130,16 @@
 
     .back-bar {
       height: 6px;
+      position: relative;
+    }
+    .back-bar::before {
+      content: '';
+      position: absolute;
+      top: -25px;
+      left: -25px;
+      right: -25px;
+      bottom: 0;
+      background: inherit;
     }
 
     .back-content {
@@ -219,13 +231,15 @@
     .back-footer {
       position: relative;
       height: 50px;
-      overflow: hidden;
+      overflow: visible;
     }
     .back-footer svg {
       position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
+      bottom: -25px;
+      left: -25px;
+      right: -25px;
+      width: calc(100% + 50px);
+      height: calc(100% + 25px);
     }
 
     .social-row {
@@ -392,6 +406,12 @@
       color: #FFFFFF;
     }
     .btn-save:hover { background: #4A6B5A; }
+
+    .btn-pdf {
+      background: #7A5480;
+      color: #FFFFFF;
+    }
+    .btn-pdf:hover { background: #6A4470; }
 
     /* Toast notification */
     .toast {
@@ -663,7 +683,7 @@
           <img class="front-logo" id="custom-front-logo" src="BLD Logo Suite (2)/BLD Logo Suite/Horizontal/PNG Transparent Background/San Gorgonio Blue.png" alt="Beaumont Library District">
           <div class="front-tagline" id="custom-tagline">Knowledge &middot; Community &middot; Discovery</div>
           <hr class="front-rule" id="custom-rule">
-          <div class="wave-bottom"><svg viewBox="0 0 700 70" preserveAspectRatio="none"><path id="custom-wave1" d="M0,40 C120,60 200,20 350,35 C500,50 600,22 700,35 L700,70 L0,70 Z"/><path id="custom-wave2" d="M0,52 C150,38 250,62 400,45 C550,28 650,55 700,45 L700,70 L0,70 Z"/></svg></div>
+          <div class="wave-bottom"><svg viewBox="0 0 700 87" preserveAspectRatio="none"><path id="custom-wave1" d="M0,40 C120,60 200,20 350,35 C500,50 600,22 700,35 L700,87 L0,87 Z"/><path id="custom-wave2" d="M0,52 C150,38 250,62 400,45 C550,28 650,55 700,45 L700,87 L0,87 Z"/></svg></div>
         </div>
         <div class="card-face card-back" id="custom-back">
           <div class="back-bar" id="custom-bar"></div>
@@ -694,7 +714,7 @@
             </div>
           </div>
           <div class="back-footer">
-            <svg viewBox="0 0 700 44" preserveAspectRatio="none"><path id="custom-footer-wave" d="M0,18 C100,30 200,8 350,20 C500,32 600,12 700,24 L700,44 L0,44 Z"/></svg>
+            <svg viewBox="0 0 700 66" preserveAspectRatio="none"><path id="custom-footer-wave" d="M0,18 C100,30 200,8 350,20 C500,32 600,12 700,24 L700,66 L0,66 Z"/></svg>
             <div class="social-row" id="custom-socials">
               <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
               <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -712,6 +732,7 @@
       <button class="btn btn-save" id="btn-save">Save Scheme</button>
       <button class="btn btn-spec" id="btn-spec">Copy Full Spec</button>
       <button class="btn btn-share" id="btn-share">Copy Share Link</button>
+      <button class="btn btn-pdf" id="btn-pdf">Export Print PDF</button>
     </div>
   </div>
 </div>
@@ -896,7 +917,7 @@ function cardFrontHTML() {
     <img class="front-logo" src="${logoBase}San Gorgonio Blue.png" alt="BLD">
     <div class="front-tagline">Knowledge &middot; Community &middot; Discovery</div>
     <hr class="front-rule">
-    <div class="wave-bottom"><svg viewBox="0 0 700 70" preserveAspectRatio="none"><path class="wave-path-1" d="M0,40 C120,60 200,20 350,35 C500,50 600,22 700,35 L700,70 L0,70 Z"/><path class="wave-path-2" d="M0,52 C150,38 250,62 400,45 C550,28 650,55 700,45 L700,70 L0,70 Z"/></svg></div>`;
+    <div class="wave-bottom"><svg viewBox="0 0 700 87" preserveAspectRatio="none"><path class="wave-path-1" d="M0,40 C120,60 200,20 350,35 C500,50 600,22 700,35 L700,87 L0,87 Z"/><path class="wave-path-2" d="M0,52 C150,38 250,62 400,45 C550,28 650,55 700,45 L700,87 L0,87 Z"/></svg></div>`;
 }
 
 function cardBackHTML() {
@@ -928,7 +949,7 @@ function cardBackHTML() {
       </div>
     </div>
     <div class="back-footer">
-      <svg viewBox="0 0 700 44" preserveAspectRatio="none"><path class="footer-wave-path" d="M0,18 C100,30 200,8 350,20 C500,32 600,12 700,24 L700,44 L0,44 Z"/></svg>
+      <svg viewBox="0 0 700 66" preserveAspectRatio="none"><path class="footer-wave-path" d="M0,18 C100,30 200,8 350,20 C500,32 600,12 700,24 L700,66 L0,66 Z"/></svg>
       <div class="social-row">
         <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
         <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -1323,6 +1344,157 @@ document.getElementById('btn-flip-all').addEventListener('click', () => {
   const cards = document.querySelectorAll('.saved-card');
   const anyFlipped = [...cards].some(c => c.classList.contains('flipped'));
   cards.forEach(c => c.classList.toggle('flipped', !anyFlipped));
+});
+
+// ═══ Export Print PDF with marks & bleed ═══
+document.getElementById('btn-pdf').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-pdf');
+  const origText = btn.textContent;
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+
+  try {
+    const CARD_W = 3.5, CARD_H = 2;
+    const BLEED = 0.125;
+    const MARK_MARGIN = 0.375;
+    const MARK_LEN = 0.25;
+    const MARK_OFFSET = 0.0625;
+
+    const PAGE_W = CARD_W + 2 * BLEED + 2 * MARK_MARGIN;
+    const PAGE_H = CARD_H + 2 * BLEED + 2 * MARK_MARGIN;
+    const BLEED_X = MARK_MARGIN;
+    const BLEED_Y = MARK_MARGIN;
+    const TRIM_X = MARK_MARGIN + BLEED;
+    const TRIM_Y = MARK_MARGIN + BLEED;
+
+    const CAPTURE_SCALE = 3;
+    const BLEED_PX = 25;
+    const CARD_W_PX = 700;
+    const CARD_H_PX = 400;
+
+    async function captureWithBleed(el) {
+      const clone = el.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.left = BLEED_PX + 'px';
+      clone.style.top = BLEED_PX + 'px';
+      clone.style.width = CARD_W_PX + 'px';
+      clone.style.height = CARD_H_PX + 'px';
+      clone.style.overflow = 'visible';
+      clone.style.borderRadius = '0';
+      clone.style.boxShadow = 'none';
+      clone.style.border = 'none';
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
+      wrapper.style.top = '0';
+      wrapper.style.width = (CARD_W_PX + 2 * BLEED_PX) + 'px';
+      wrapper.style.height = (CARD_H_PX + 2 * BLEED_PX) + 'px';
+      wrapper.style.background = el.style.background;
+      wrapper.style.overflow = 'hidden';
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
+      const canvas = await html2canvas(wrapper, {
+        scale: CAPTURE_SCALE,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+      });
+
+      document.body.removeChild(wrapper);
+      return canvas;
+    }
+
+    const frontEl = document.getElementById('custom-front');
+    const backEl = document.getElementById('custom-back');
+
+    const [frontCanvas, backCanvas] = await Promise.all([
+      captureWithBleed(frontEl),
+      captureWithBleed(backEl),
+    ]);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [PAGE_W, PAGE_H],
+    });
+
+    function drawMarksAndCard(canvas, label) {
+      const imgData = canvas.toDataURL('image/png');
+      const bleedW = CARD_W + 2 * BLEED;
+      const bleedH = CARD_H + 2 * BLEED;
+      pdf.addImage(imgData, 'PNG', BLEED_X, BLEED_Y, bleedW, bleedH);
+
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setLineWidth(0.003);
+
+      const corners = [
+        [TRIM_X, TRIM_Y],
+        [TRIM_X + CARD_W, TRIM_Y],
+        [TRIM_X, TRIM_Y + CARD_H],
+        [TRIM_X + CARD_W, TRIM_Y + CARD_H],
+      ];
+
+      corners.forEach(([cx, cy]) => {
+        const isLeft = cx === TRIM_X;
+        const isTop  = cy === TRIM_Y;
+
+        const hStart = isLeft ? cx - MARK_OFFSET - MARK_LEN : cx + MARK_OFFSET;
+        const hEnd   = isLeft ? cx - MARK_OFFSET : cx + MARK_OFFSET + MARK_LEN;
+        pdf.line(hStart, cy, hEnd, cy);
+
+        const vStart = isTop ? cy - MARK_OFFSET - MARK_LEN : cy + MARK_OFFSET;
+        const vEnd   = isTop ? cy - MARK_OFFSET : cy + MARK_OFFSET + MARK_LEN;
+        pdf.line(cx, vStart, cx, vEnd);
+      });
+
+      function drawRegMark(x, y) {
+        const r = 0.05;
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.002);
+        pdf.circle(x, y, r, 'S');
+        pdf.line(x - r * 2, y, x + r * 2, y);
+        pdf.line(x, y - r * 2, x, y + r * 2);
+      }
+
+      const centerX = TRIM_X + CARD_W / 2;
+      const centerY = TRIM_Y + CARD_H / 2;
+      drawRegMark(centerX, BLEED_Y - MARK_MARGIN / 2);
+      drawRegMark(centerX, BLEED_Y + bleedH + MARK_MARGIN / 2);
+      drawRegMark(BLEED_X - MARK_MARGIN / 2, centerY);
+      drawRegMark(BLEED_X + bleedW + MARK_MARGIN / 2, centerY);
+
+      pdf.setFontSize(5.5);
+      pdf.setTextColor(120, 120, 120);
+      const slugY = PAGE_H - MARK_MARGIN * 0.25;
+      pdf.text(
+        `BLD Business Card \u2014 ${label} \u2014 3.5\u2033\u00d72\u2033 \u2014 0.125\u2033 bleed \u2014 CMYK conversion recommended`,
+        TRIM_X, slugY
+      );
+      pdf.text(
+        new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        TRIM_X + CARD_W, slugY, { align: 'right' }
+      );
+    }
+
+    drawMarksAndCard(frontCanvas, 'Front');
+    pdf.addPage([PAGE_W, PAGE_H], 'landscape');
+    drawMarksAndCard(backCanvas, 'Back');
+
+    const schemeName = generateSchemeName(state).replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '-').toLowerCase();
+    pdf.save(`bld-card-${schemeName}-print.pdf`);
+    showToast('Print-ready PDF exported');
+
+  } catch (err) {
+    console.error('PDF export failed:', err);
+    showToast('PDF export failed \u2014 see console');
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
 });
 
 // ═══ Initial render ═══
