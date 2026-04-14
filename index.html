@@ -50,6 +50,12 @@
       gap: 1.5rem;
     }
 
+    .card-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .card-face {
       width: var(--card-w);
       height: var(--card-h);
@@ -156,17 +162,19 @@
       transform: translateY(-50%);
       padding-right: 2.7rem;
       border-right: 2px solid rgba(0,0,0,0.1);
-      max-width: 280px;
+      width: 280px;
       z-index: 2;
     }
 
     .back-name {
       font-family: 'DM Serif Display', serif;
       font-size: 2.1rem;
-      line-height: 1.2;
-      white-space: nowrap;
+      line-height: 1.25;
+      white-space: pre-wrap;
+      word-break: break-word;
       overflow: hidden;
       outline: none;
+      max-height: 5.25rem; /* 2 lines: 2.1rem * 1.25 * 2 */
     }
     .back-name:focus {
       border-bottom: 2px solid rgba(0,0,0,0.15);
@@ -182,6 +190,14 @@
       font-size: 1.17rem;
       margin-top: 0.45rem;
       letter-spacing: 0.02em;
+      outline: none;
+    }
+    .back-jobtitle:focus {
+      border-bottom: 2px solid rgba(0,0,0,0.15);
+    }
+    .back-jobtitle:empty::before {
+      content: 'Job Title';
+      opacity: 0.35;
     }
 
     .back-logo-small {
@@ -276,6 +292,11 @@
         align-items: center;
       }
     }
+    @media (min-width: 1481px) {
+      .card-column .picker-row {
+        max-width: var(--card-w);
+      }
+    }
     @media (max-width: 740px) {
       .card-face {
         width: 92vw;
@@ -285,7 +306,7 @@
       .front-tagline { font-size: 0.825rem; }
       .back-content { padding: 1.5rem 1.8rem; gap: 1.2rem; }
       .back-name { font-size: 1.65rem; }
-      .back-identity { left: 1.8rem; padding-right: 1.2rem; max-width: 200px; }
+      .back-identity { left: 1.8rem; padding-right: 1.2rem; width: 200px; }
       .contact-text { font-size: 1.02rem; }
       .back-logo-small { width: 120px; top: calc(6px + 1.5rem); left: 1.8rem; }
     }
@@ -317,34 +338,14 @@
     }
 
     /* Swatch-dropdown pickers below the cards */
-    .builder-pickers {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.2rem;
-      margin-top: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .picker-row {
+    .card-pickers {
       display: flex;
       align-items: flex-start;
       gap: 1rem;
       flex-wrap: wrap;
       justify-content: center;
-    }
-
-    .picker-row-label {
-      font-family: 'Libre Franklin', sans-serif;
-      font-weight: 600;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #7A7063;
-      writing-mode: horizontal-tb;
-      min-width: 40px;
-      text-align: right;
-      padding-top: 0.6rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
     }
 
     .picker-swatch.contrast-warn {
@@ -394,6 +395,7 @@
       display: flex;
       justify-content: center;
       gap: 0.8rem;
+      margin-top: 2rem;
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
@@ -449,6 +451,52 @@
       color: #FFFFFF;
     }
     .btn-pdf:hover { background: #6A4470; }
+
+    /* Export dropdown */
+    .export-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .btn-export-toggle {
+      background: #8B5E3C;
+      color: #FFFFFF;
+    }
+    .btn-export-toggle:hover { background: #7A5030; }
+    .btn-export-toggle::after {
+      content: ' \25BE';
+      font-size: 0.7em;
+    }
+    .export-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      min-width: 180px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.08);
+      z-index: 100;
+      overflow: hidden;
+    }
+    .export-dropdown.open .export-menu { display: block; }
+    .export-menu-item {
+      display: block;
+      width: 100%;
+      padding: 0.6rem 1rem;
+      font-family: 'Libre Franklin', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #4A453D;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .export-menu-item:hover { background: rgba(21,66,74,0.06); }
+    .export-menu-item + .export-menu-item { border-top: 1px solid rgba(0,0,0,0.06); }
 
     /* Toast notification */
     .toast {
@@ -510,16 +558,23 @@
     }
 
     .saved-header-actions {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
       margin-bottom: 2.5rem;
     }
 
-    .btn-flip-all {
+    .btn-flip-all,
+    .btn-export-collection,
+    .btn-import-collection {
       background: transparent;
       color: #15424A;
       border: 1px solid rgba(21,66,74,0.25);
     }
-    .btn-flip-all:hover { background: rgba(21,66,74,0.06); }
+    .btn-flip-all:hover,
+    .btn-export-collection:hover,
+    .btn-import-collection:hover { background: rgba(21,66,74,0.06); }
+    .import-file-input { display: none; }
 
     .saved-grid {
       display: grid;
@@ -715,6 +770,7 @@
 <div class="builder">
   <div class="builder-preview">
     <div class="card-wrapper">
+      <div class="card-column">
         <div class="card-face card-front" id="custom-front">
           <div class="accent-strip" id="custom-strip"></div>
           <img class="front-logo" id="custom-front-logo" src="BLD Logo Suite (2)/BLD Logo Suite/Horizontal/PNG Transparent Background/San Gorgonio Blue.png" alt="Beaumont Library District">
@@ -722,13 +778,16 @@
           <hr class="front-rule" id="custom-rule">
           <div class="wave-bottom"><svg viewBox="0 0 700 87" preserveAspectRatio="none"><path id="custom-wave1" d="M0,40 C120,60 200,20 350,35 C500,50 600,22 700,35 L700,87 L0,87 Z"/><path id="custom-wave2" d="M0,52 C150,38 250,62 400,45 C550,28 650,55 700,45 L700,87 L0,87 Z"/></svg></div>
         </div>
+        <div class="card-pickers" id="front-pickers"></div>
+      </div>
+      <div class="card-column">
         <div class="card-face card-back" id="custom-back">
           <div class="back-bar" id="custom-bar"></div>
           <img class="back-logo-small" id="custom-back-logo" src="BLD Logo Suite (2)/BLD Logo Suite/Horizontal/PNG Transparent Background/San Gorgonio Blue.png" alt="">
           <div class="back-content">
             <div class="back-identity" id="custom-identity">
               <div class="back-name" id="custom-name" contenteditable="true" spellcheck="false">First Lastname</div>
-              <div class="back-jobtitle" id="custom-jobtitle">Library Services</div>
+              <div class="back-jobtitle" id="custom-jobtitle" contenteditable="true" spellcheck="false">Library Services</div>
             </div>
             <div class="back-contact" id="custom-contact">
               <div class="contact-item">
@@ -758,17 +817,22 @@
             </div>
           </div>
         </div>
+        <div class="card-pickers" id="back-pickers"></div>
+      </div>
     </div>
-
-    <div class="builder-pickers" id="builder-pickers"></div>
 
     <div class="builder-actions">
       <button class="btn btn-randomize" id="btn-randomize">Randomize</button>
       <button class="btn btn-reset" id="btn-reset">Reset</button>
-      <button class="btn btn-save" id="btn-save">Save Scheme</button>
-      <button class="btn btn-spec" id="btn-spec">Copy Full Spec</button>
-      <button class="btn btn-share" id="btn-share">Copy Share Link</button>
-      <button class="btn btn-pdf" id="btn-pdf">Export Print PDF</button>
+      <button class="btn btn-save" id="btn-save">Add to Gallery</button>
+      <div class="export-dropdown" id="export-dropdown">
+        <button class="btn btn-export-toggle" id="btn-export-toggle">Export</button>
+        <div class="export-menu">
+          <button class="export-menu-item" id="btn-spec">Copy Full Spec</button>
+          <button class="export-menu-item" id="btn-share">Copy Share Link</button>
+          <button class="export-menu-item" id="btn-pdf">Export Print PDF</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -781,6 +845,9 @@
   <p class="saved-subtitle">Hover over any card to flip between front &amp; back</p>
   <div class="saved-header-actions">
     <button class="btn btn-flip-all" id="btn-flip-all">Flip All</button>
+    <button class="btn btn-export-collection" id="btn-export-collection">Export Collection</button>
+    <button class="btn btn-import-collection" id="btn-import-collection">Import Collection</button>
+    <input type="file" accept=".json" class="import-file-input" id="import-file-input">
   </div>
   <div class="saved-grid" id="saved-grid"></div>
 </div>
@@ -927,7 +994,7 @@ function applyState() {
   // Back text
   document.getElementById('custom-name').style.color = txt;
   document.getElementById('custom-jobtitle').style.color = bc1;
-  document.getElementById('custom-identity').style.borderRight = `2px solid ${lighten(bc1, 180)}`;
+  document.getElementById('custom-identity').style.borderRight = `2px solid ${bc1}33`;
 
   // Contact items
   document.querySelectorAll('#custom-contact .contact-icon').forEach(el => el.style.color = bc1);
@@ -949,20 +1016,30 @@ function applyState() {
 }
 
 // ═══ Auto-scale name to fit container ═══
+// Strategy: keep max font size and let text wrap to 2 lines first.
+// Only shrink font when even 2 lines overflow the max-height.
 function autoScaleName(el) {
-  const maxFontSize = 2.1; // rem
-  el.style.fontSize = maxFontSize + 'rem';
-  let size = maxFontSize;
-  while (el.scrollWidth > el.clientWidth && size > 0.8) {
-    size -= 0.05;
+  const MAX = 2.1, MIN = 0.8, STEP = 0.05;
+  el.style.fontSize = MAX + 'rem';
+  el.style.maxHeight = (MAX * 1.25 * 2) + 'rem';
+  if (el.scrollHeight <= el.clientHeight) return;
+  let size = MAX;
+  while (size > MIN && el.scrollHeight > el.clientHeight) {
+    size -= STEP;
     el.style.fontSize = size + 'rem';
+    el.style.maxHeight = (size * 1.25 * 2) + 'rem';
   }
 }
 
 const nameEl = document.getElementById('custom-name');
 nameEl.addEventListener('input', () => autoScaleName(nameEl));
 nameEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    // Allow at most one line break (two lines total)
+    if (nameEl.innerText.includes('\n')) return;
+    document.execCommand('insertLineBreak');
+  }
 });
 
 // ═══ Apply state to a saved card element ═══
@@ -1006,7 +1083,7 @@ function applyStateToCard(cardEl, s) {
   // Back text
   cardEl.querySelector('.saved-flip-back .back-name').style.color = txt;
   cardEl.querySelector('.saved-flip-back .back-jobtitle').style.color = bc1;
-  cardEl.querySelector('.saved-flip-back .back-identity').style.borderRight = `2px solid ${lighten(bc1, 180)}`;
+  cardEl.querySelector('.saved-flip-back .back-identity').style.borderRight = `2px solid ${bc1}33`;
 
   // Contact
   cardEl.querySelectorAll('.saved-flip-back .contact-icon').forEach(el => el.style.color = bc1);
@@ -1094,7 +1171,10 @@ const PICKER_ROWS = [
 // Flat list for iteration
 const PICKER_DEFS = PICKER_ROWS.flatMap(row => row.pickers);
 
-const pickersContainer = document.getElementById('builder-pickers');
+const pickerContainers = {
+  Front: document.getElementById('front-pickers'),
+  Back: document.getElementById('back-pickers'),
+};
 
 function getSwatchColor(name, options) {
   const val = options[name];
@@ -1120,15 +1200,9 @@ function passesContrast(pickerKey, colorName) {
   return contrastRatio(hex, bgHex) >= rule.threshold;
 }
 
-// Build the two-row picker UI
+// Build picker UI under each card
 PICKER_ROWS.forEach(rowDef => {
-  const row = document.createElement('div');
-  row.className = 'picker-row';
-
-  const rowLabel = document.createElement('span');
-  rowLabel.className = 'picker-row-label';
-  rowLabel.textContent = rowDef.label;
-  row.appendChild(rowLabel);
+  const container = pickerContainers[rowDef.label];
 
   rowDef.pickers.forEach(def => {
     const picker = document.createElement('div');
@@ -1159,10 +1233,9 @@ PICKER_ROWS.forEach(rowDef => {
         opt.value = name;
         opt.textContent = name;
         if (name === state[def.key]) opt.selected = true;
-        // Hard-filter: disable options that fail contrast
+        // Label options that fail contrast (still selectable; randomizer skips them)
         const rule = CONTRAST_RULES[def.key];
-        if (rule && rule.mode === 'hard' && !passesContrast(def.key, name)) {
-          opt.disabled = true;
+        if (rule && !passesContrast(def.key, name)) {
           opt.textContent = name + ' (low contrast)';
         }
         select.appendChild(opt);
@@ -1188,10 +1261,8 @@ PICKER_ROWS.forEach(rowDef => {
     picker.appendChild(swatch);
     picker.appendChild(select);
     picker.appendChild(label);
-    row.appendChild(picker);
+    container.appendChild(picker);
   });
-
-  pickersContainer.appendChild(row);
 });
 
 function updateContrastWarnings() {
@@ -1231,8 +1302,7 @@ function refreshSwatchUI() {
         opt.textContent = name;
         if (name === state[def.key]) opt.selected = true;
         const rule = CONTRAST_RULES[def.key];
-        if (rule && rule.mode === 'hard' && !passesContrast(def.key, name)) {
-          opt.disabled = true;
+        if (rule && !passesContrast(def.key, name)) {
           opt.textContent = name + ' (low contrast)';
         }
         select.appendChild(opt);
@@ -1556,8 +1626,9 @@ function generateSchemeName(s) {
 
 // ═══ Save button ═══
 document.getElementById('btn-save').addEventListener('click', () => {
-  const suggested = generateSchemeName(state);
-  const name = prompt('Name this scheme:', suggested);
+  const personName = document.getElementById('custom-name').innerText.trim().replace(/\n/g, ' ');
+  const suggested = personName && personName !== 'First Lastname' ? personName : generateSchemeName(state);
+  const name = prompt('Name this card:', suggested);
   if (!name || !name.trim()) return;
 
   const saved = getSaved();
@@ -1733,6 +1804,70 @@ document.getElementById('btn-pdf').addEventListener('click', async () => {
     btn.textContent = origText;
     btn.disabled = false;
   }
+});
+
+// ═══ Export dropdown toggle ═══
+const exportDropdown = document.getElementById('export-dropdown');
+document.getElementById('btn-export-toggle').addEventListener('click', (e) => {
+  e.stopPropagation();
+  exportDropdown.classList.toggle('open');
+});
+document.addEventListener('click', () => exportDropdown.classList.remove('open'));
+exportDropdown.querySelector('.export-menu').addEventListener('click', () => {
+  exportDropdown.classList.remove('open');
+});
+
+// ═══ Export Collection ═══
+document.getElementById('btn-export-collection').addEventListener('click', () => {
+  const saved = getSaved();
+  if (!saved.length) {
+    showToast('No saved schemes to export');
+    return;
+  }
+  const json = JSON.stringify(saved, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bld-card-collection-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${saved.length} scheme${saved.length === 1 ? '' : 's'}`);
+});
+
+// ═══ Import Collection ═══
+document.getElementById('btn-import-collection').addEventListener('click', () => {
+  document.getElementById('import-file-input').click();
+});
+document.getElementById('import-file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported)) throw new Error('Not an array');
+      const valid = imported.filter(s => s && s.state && s.name);
+      if (!valid.length) {
+        showToast('No valid schemes found in file');
+        return;
+      }
+      const saved = getSaved();
+      let added = 0;
+      for (const entry of valid) {
+        if (saved.length >= 20) break;
+        saved.push({ name: entry.name, date: entry.date || new Date().toISOString(), state: entry.state });
+        added++;
+      }
+      setSaved(saved);
+      renderSaved();
+      showToast(`Imported ${added} scheme${added === 1 ? '' : 's'}${valid.length > added ? ` (${valid.length - added} skipped — max 20)` : ''}`);
+    } catch (err) {
+      showToast('Invalid collection file');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 });
 
 // ═══ Initial render ═══
