@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" --version)",
+      "Bash(\"/c/Program Files \\(x86\\)/GitHub CLI/gh.exe\" --version)",
+      "Bash(powershell.exe -Command \"\\(Get-Command gh\\).Source\")",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create beaumont-businesscard --public --source=. --push)",
+      "mcp__browsermcp__browser_get_console_logs",
+      "mcp__browsermcp__browser_navigate",
+      "mcp__browsermcp__browser_click",
+      "mcp__browsermcp__browser_snapshot",
+      "mcp__browsermcp__browser_screenshot",
+      "Read(//c/Users/maxam/.claude/skills/dev-browser/**)",
+      "Bash(bash server.sh)"
+    ]
+  }
+}
